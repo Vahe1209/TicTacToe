@@ -1,16 +1,18 @@
-function runTicTacToe(size) {
-  let myTableDiv = document.getElementById("myDynamicTable");
+let bool = true;
+let cell = [];
+let horizonLine = [];
+let vertLine = [];
+let diagLine = [];
+let secondDiagLine = [];
+let size = 3;
+let isWinner = false;
+let winner = "";
+let myTableDiv = document.getElementById("myDynamicTable");
+function runTicTacToe() {
   let table = document.createElement("TABLE");
   table.border = "1";
   let tableBody = document.createElement("TBODY");
   table.appendChild(tableBody);
-  let bool = true;
-  let cell = [];
-  let horizonLine = [];
-  let vertLine = [];
-  let diagLine = [];
-  let secondDiagLine = [];
-  let winner;
 
   for (let i = 0; i < size; i++) {
     let tr = document.createElement("TR");
@@ -19,18 +21,12 @@ function runTicTacToe(size) {
       let td = document.createElement("TD");
       td.width = "75";
       cell.push(td);
-      td.addEventListener("click", function () {
-        if (bool && td.innerHTML === "") {
-          td.appendChild(document.createTextNode("X"));
-          bool = !bool;
-        } else if (!bool && td.innerHTML === "") {
-          td.appendChild(document.createTextNode("O"));
-          bool = !bool;
-        }
-      });
       tr.appendChild(td);
+      td.addEventListener("click", eventing);
     }
   }
+  myTableDiv.appendChild(table);
+
   for (let m = 0; m < cell.length; m += size) {
     horizonLine.push(cell.slice(m, m + size));
   }
@@ -41,7 +37,51 @@ function runTicTacToe(size) {
     diagLine.push(horizonLine[i][i]);
     secondDiagLine.push(horizonLine[i][horizonLine.length - i - 1]);
   }
-  myTableDiv.appendChild(table);
 }
+runTicTacToe();
 
-runTicTacToe(3);
+function eventing() {
+  if (this.innerHTML === "") {
+    if (bool) {
+      this.appendChild(document.createTextNode("X"));
+    } else {
+      this.appendChild(document.createTextNode("O"));
+    }
+    bool = !bool;
+  }
+  const allEqual = (arr) =>
+    arr.every((v) => v.innerHTML.toString() === arr[0].innerHTML.toString());
+  for (let m = 0; m < horizonLine.length; m++) {
+    if (
+      horizonLine[m][0].innerHTML.toString() !== "" &&
+      allEqual(horizonLine[m])
+    ) {
+      winner = horizonLine[m][0].innerHTML.toString();
+      isWinner = true;
+    }
+  }
+  for (let m = 0; m < vertLine.length; m++) {
+    if (vertLine[m][0].innerHTML.toString() !== "" && allEqual(vertLine[m])) {
+      winner = vertLine[m][0].innerHTML.toString();
+      isWinner = true;
+    }
+  }
+  if (diagLine[0].innerHTML.toString() !== "" && allEqual(diagLine)) {
+    winner = diagLine[0].innerHTML.toString();
+    isWinner = true;
+  }
+
+  if (
+    secondDiagLine[0].innerHTML.toString() !== "" &&
+    allEqual(secondDiagLine)
+  ) {
+    winner = secondDiagLine[0].innerHTML.toString();
+    isWinner = true;
+  }
+  if (isWinner == true) {
+    alert("Winner is " + winner);
+    for (let m = 0; m < cell.length; m += 1) {
+      cell[m].removeEventListener("click", eventing);
+    }
+  }
+}
